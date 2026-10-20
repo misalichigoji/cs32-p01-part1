@@ -86,6 +86,26 @@ Vector<T>::Vector(std::size_t n, const T& value) {
 template <typename T>
 Vector<T>::Vector(std::initializer_list<T> il) {
     // TODO
+    if(il.size() == 0)
+    {
+        begin_ = nullptr;
+        end_ = nullptr;
+        end_cap_ = nullptr;
+    }
+    else
+    {
+        begin_ = new T;
+        T* tempr = begin;
+        T* tempil = il.begin();
+        while(tempil != il.end())
+        {
+            tempr* = tempil*;
+            tempr++;
+            tempil++;
+        }
+        end_ = tempr;
+        end_cap_ = tempr;
+    }
     throw std::logic_error("Vector(initializer_list) not implemented");
 }
 
