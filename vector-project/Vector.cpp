@@ -133,7 +133,10 @@ Vector<T>& Vector<T>::operator=(const Vector& other) {
 // Destructor. 
 template <typename T>
 Vector<T>::~Vector() {
-    
+    delete[] begin_;
+    begin_ = nullptr;
+    end_ = nullptr;
+    end_cap_ = nullptr;
 }
 
 // ---- Private helper ----
@@ -156,48 +159,50 @@ void Vector<T>::reallocate(std::size_t new_cap) {
 // (just like std::vector). at() is the version that checks.
 template <typename T>
 T& Vector<T>::operator[](std::size_t i) {
-    // TODO
-    throw std::logic_error("operator[] not implemented");
-}
+    return begin_ + i;
+}//?
 
 // Same as above, for const vectors. operator== needs this: its parameters are
 // const Vector&, so it can only read elements through a const member function.
 template <typename T>
 const T& Vector<T>::operator[](std::size_t i) const {
-    // TODO
-    throw std::logic_error("operator[] const not implemented");
-}
+    return const (begin_ + i)
+}//?
 
 // Returns a reference to element i.
 // Throws std::out_of_range if i >= size().
 template <typename T>
 T& Vector<T>::at(std::size_t i) {
-    // TODO
-    throw std::logic_error("at() not implemented");
+    if(i >= size())
+        throw std::out_of_range("index " + std::to_string(i) + " is out of range");
+    return begin_ + i;
 }
 
 // Returns a reference to the first element.
 // Throws std::out_of_range if the vector is empty.
 template <typename T>
 T& Vector<T>::front() {
-    // TODO
-    throw std::logic_error("front() not implemented");
+    if(begin_ == nullptr)
+        throw std::out_of_range("vector is empty");
+    return begin_;
 }
 
 // Returns a reference to the last element.
 // Throws std::out_of_range if the vector is empty.
 template <typename T>
 T& Vector<T>::back() {
-    // TODO
-    throw std::logic_error("back() not implemented");
+    if(begin_ == nullptr)
+        throw std::out_of_range("vector is empty");
+    return end_--;
 }
 
 // Returns a pointer to the first element of the buffer, or nullptr if there
 // is no buffer.
 template <typename T>
 T* Vector<T>::data() {
-    // TODO
-    throw std::logic_error("data() not implemented");
+    if(begin_ == nullptr)
+        return nullptr;
+    return &begin_;
 }
 
 // ---- Iterators ----
@@ -206,31 +211,27 @@ T* Vector<T>::data() {
 // range-for loops and std::sort work on your Vector.
 template <typename T>
 T* Vector<T>::begin() {
-    // TODO
-    throw std::logic_error("begin() not implemented");
+    return &begin_;
 }
 
 // Same as above, for const vectors. Together with end() const, this lets a
 // range-for loop run over a const Vector&.
 template <typename T>
 const T* Vector<T>::begin() const {
-    // TODO
-    throw std::logic_error("begin() const not implemented");
+    return const(&begin);
 }
 
 // Returns a pointer one past the last element (not past the end of the
 // buffer). For an empty vector, end() == begin().
 template <typename T>
 T* Vector<T>::end() {
-    // TODO
-    throw std::logic_error("end() not implemented");
+    return &end_;
 }
 
 // Same as above, for const vectors.
 template <typename T>
 const T* Vector<T>::end() const {
-    // TODO
-    throw std::logic_error("end() const not implemented");
+    return const(&end_);
 }
 
 // ---- Capacity ----
@@ -238,22 +239,23 @@ const T* Vector<T>::end() const {
 // Returns the number of elements currently stored.
 template <typename T>
 std::size_t Vector<T>::size() const {
-    // TODO
-    throw std::logic_error("size() not implemented");
+    return end_ - begin_;
 }
 
 // Returns how many elements the buffer can hold before it must grow.
 template <typename T>
 std::size_t Vector<T>::capacity() const {
-    // TODO
-    throw std::logic_error("capacity() not implemented");
+    if(begin_ == nullptr)
+        return 0
+    return end_cap_ - begin_;
 }
 
 // Returns true if the vector has no elements (size() == 0).
 template <typename T>
 bool Vector<T>::empty() const {
-    // TODO
-    throw std::logic_error("empty() not implemented");
+    if(begin_ == nullptr)
+        return true;
+    return false;
 }
 
 // Makes room for n elements up front, so that the vector can later grow to
