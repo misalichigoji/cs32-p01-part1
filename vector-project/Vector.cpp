@@ -38,14 +38,17 @@ Vector<T>::Vector() {
 // for std::string, and calls the default constructor for a class type.
 template <typename T>
 Vector<T>::Vector(std::size_t n) {  
-    begin = new T;
-    end = begin + n;
-    end_cap_ = end;
-    T* temp = begin;
-    while(temp != end)
+    if(n == 0)
     {
-        temp* = T();
-        temp++;
+        begin_ = nullptr;
+        end_ = nullptr;
+        end_cap = nullptr;
+    }
+    else
+    {
+        begin_ = new T[n]();
+        end_ = begin + n;
+        end_cap_ = end;
     }
 }//?
 
@@ -61,13 +64,13 @@ Vector<T>::Vector(std::size_t n, const T& value) {
     }
     else
     {
-        begin = new T;
-        end = begin + n;
+        begin_ = new T[n];
+        end_ = begin_ + n;
         end_cap_ = end;
-        T* temp = begin;
-        while(temp != end)
+        T* temp = begin_;
+        while(temp != end_)
         {
-            temp* = value;
+            *temp = value;
             temp++;
         }
     }
@@ -94,20 +97,19 @@ Vector<T>::Vector(std::initializer_list<T> il) {
     }
     else
     {
-        begin_ = new T;
-        T* tempr = begin;
+        begin_ = new T[il.size()];
+        T* tempr = begin_;
         T* tempil = il.begin();
         while(tempil != il.end())
         {
-            tempr* = tempil*;
+            *tempr = *tempil;
             tempr++;
             tempil++;
         }
         end_ = tempr;
         end_cap_ = tempr;
     }
-    throw std::logic_error("Vector(initializer_list) not implemented");
-}
+}//?
 
 // Copy constructor. Makes a deep copy of other. The new capacity is other.size() 
 // (not other.capacity()).
@@ -131,7 +133,7 @@ Vector<T>& Vector<T>::operator=(const Vector& other) {
 // Destructor. 
 template <typename T>
 Vector<T>::~Vector() {
-    // TODO
+    
 }
 
 // ---- Private helper ----
