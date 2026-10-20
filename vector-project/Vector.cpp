@@ -264,8 +264,25 @@ bool Vector<T>::empty() const {
 // and capacity never goes down.
 template <typename T>
 void Vector<T>::reserve(std::size_t n) {
-    // TODO
-    throw std::logic_error("reserve() not implemented");
+    if(n <= capacity())
+        return;
+    T* temp = new T[n];
+    T* newb = temp;
+    T* oldb = begin_;
+    begin_ = temp;
+    while(begin_ != end_)
+    {
+        *temp = *begin_;
+        temp++;
+        begin_++;
+    }
+    delete[] oldb;
+    begin_ = newb;
+    end_ = begin_ + n;
+    capacity_ = end_;
+    temp = nullptr;
+    newb = nullptr;
+    oldb = nullptr;
 }
 
 // Shrinks the buffer so capacity() == size(), keeping the elements.
@@ -273,7 +290,18 @@ void Vector<T>::reserve(std::size_t n) {
 // and all three pointers become nullptr.
 template <typename T>
 void Vector<T>::shrink_to_fit() {
-    // TODO
+    if(capacity() == size())
+        return;
+    if(size() == 0)
+    {
+        delete[] begin_;
+        begin_ = nullptr;
+        end_cap_ = nullptr;
+        end_ = nullptr;
+        return
+    }
+    
+    //TODO
     throw std::logic_error("shrink_to_fit() not implemented");
 }
 
