@@ -24,9 +24,10 @@
 // allocation.
 template <typename T>
 Vector<T>::Vector() {
-    // TODO
-    throw std::logic_error("Vector() not implemented");
-}
+    begin_ = nullptr;
+    end_ = nullptr;
+    end_cap_ = nullptr;
+} //done?
 
 // Creates a vector of n elements, each value-initialized (0 for int, "" for
 // std::string). Size and capacity are both n. Note that new T[n] does NOT
@@ -36,18 +37,41 @@ Vector<T>::Vector() {
 // every type: it gives 0 for int, 0.0 for double, nullptr for pointers, ""
 // for std::string, and calls the default constructor for a class type.
 template <typename T>
-Vector<T>::Vector(std::size_t n) {
-    // TODO
-    throw std::logic_error("Vector(n) not implemented");
-}
+Vector<T>::Vector(std::size_t n) {  
+    begin = new T;
+    end = begin + n;
+    end_cap_ = end;
+    T* temp = begin;
+    while(temp != end)
+    {
+        temp* = T();
+        temp++;
+    }
+}//?
 
 // Creates a vector of n copies of value. Size and capacity are both n.
 // If n is 0, allocates nothing.
 template <typename T>
 Vector<T>::Vector(std::size_t n, const T& value) {
-    // TODO
-    throw std::logic_error("Vector(n, value) not implemented");
-}
+    if(n == 0)
+    {
+        begin_ = nullptr;
+        end_ = nullptr;
+        end_cap_ = nullptr;
+    }
+    else
+    {
+        begin = new T;
+        end = begin + n;
+        end_cap_ = end;
+        T* temp = begin;
+        while(temp != end)
+        {
+            temp* = value;
+            temp++;
+        }
+    }
+}//done?
 
 // Creates a vector holding the elements of il, in order: Vector<int> v{1, 2, 3}.
 // Size and capacity are both il.size(). If il is empty, allocates nothing.
