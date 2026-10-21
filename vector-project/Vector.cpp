@@ -150,6 +150,7 @@ template <typename T>
 void Vector<T>::reallocate(std::size_t new_cap) {
     if(new_cap == 0)
     {
+        delete[] begin_;
         begin_ = nullptr;
         end_ = nullptr;
         end_cap_ = nullptr;
@@ -170,7 +171,7 @@ void Vector<T>::reallocate(std::size_t new_cap) {
     }
     delete[] oldb;
     begin_ = newb;
-    end = newb + s;
+    end_ = newb + s;
     end_cap_ = begin_ + new_cap;
 }
 
@@ -261,6 +262,8 @@ const T* Vector<T>::end() const {
 // Returns the number of elements currently stored.
 template <typename T>
 std::size_t Vector<T>::size() const {
+    if(begin_ == nullptr)
+        return 0;
     return end_ - begin_;
 }
 
@@ -284,23 +287,8 @@ bool Vector<T>::empty() const {
 // and capacity never goes down.
 template <typename T>
 void Vector<T>::reserve(std::size_t n) {
-    if(n <= capacity())
-        return;
-    T* temp = new T[n];
-    T* newb = temp;
-    T* oldb = begin_;
-    T* curr = begin_;
-    std::size_t s = size();
-    while(curr != end_)
-    {
-        *temp = *curr;
-        temp++;
-        curr++;
-    }
-    delete[] oldb;
-    begin_ = newb;
-    end_ = begin_ + s;
-    end_cap_ = end_;
+    if (n > capacity()) 
+        reallocate(n);
 }
 
 // Shrinks the buffer so capacity() == size(), keeping the elements.
@@ -308,30 +296,8 @@ void Vector<T>::reserve(std::size_t n) {
 // and all three pointers become nullptr.
 template <typename T>
 void Vector<T>::shrink_to_fit() {
-    if(capacity() == size())
-        return;
-    if(size() == 0)
-    {
-        delete[] begin_;
-        begin_ = nullptr;
-        end_cap_ = nullptr;
-        end_ = nullptr;
-        return;
-    }
-    T* temp = new T[size()];
-    T* newb = temp;
-    T* oldb = begin_;
-    T* curr = begin_;
-    while(curr != end_)
-    {
-        *temp = *curr;
-        temp++;
-        curr++;
-    }
-    delete[] oldb;
-    begin_ = newb;
-    end_cap_ = begin_ + size();
-    end_ = end_cap_;
+    if (size() != capacity()) 
+        reallocate(size());
 }
 
 
@@ -383,14 +349,14 @@ void Vector<T>::resize(std::size_t n) {
     if(size() > n)
     {
         std::size_t count = size() - n;
-        for(int i = 0; i < count; i++)
+        for(std::size_t i = 0; i < count; i++)
             pop_back();
         return;
     }
     if(capacity() < n)
         reserve(n);
     std::size_t count = n - size();
-    for(int i = 0; i < count; i++)
+    for(std::size_t i = 0; i < count; i++)
         push_back(T());
 }
 
