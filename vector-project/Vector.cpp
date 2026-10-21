@@ -74,7 +74,7 @@ Vector<T>::Vector(std::size_t n, const T& value) {
             temp++;
         }
     }
-}//done?
+}
 
 // Creates a vector holding the elements of il, in order: Vector<int> v{1, 2, 3}.
 // Size and capacity are both il.size(). If il is empty, allocates nothing.
@@ -109,15 +109,30 @@ Vector<T>::Vector(std::initializer_list<T> il) {
         end_ = tempr;
         end_cap_ = tempr;
     }
-}//?
+}
 
 // Copy constructor. Makes a deep copy of other. The new capacity is other.size() 
 // (not other.capacity()).
 // If other is empty, allocates nothing.
 template <typename T>
 Vector<T>::Vector(const Vector& other) {
-    // TODO
-    throw std::logic_error("Vector(const Vector&) not implemented");
+    if(other.empty())
+    {
+        begin_ = nullptr;
+        end_ = nullptr;
+        end_cap_ = nullptr;
+        return;
+    }
+    begin_ = new T[other.size()];
+    end_ = begin_;
+    end_cap_ = begin_ + other.size();
+    T* temp = other.begin_;
+    while(temp != other.end_)
+    {
+        *end_ = *temp;
+        end_++;
+        temp++;
+    }
 }
 
 // Copy assignment operator. Replaces this vector's contents with a deep copy
@@ -126,8 +141,28 @@ Vector<T>::Vector(const Vector& other) {
 // unchanged. Returns *this so that a = b = c works.
 template <typename T>
 Vector<T>& Vector<T>::operator=(const Vector& other) {
-    // TODO
-    throw std::logic_error("operator= not implemented");
+    if(this == &other)
+        return *this;
+    delete[] begin_;
+
+    if(other.empty())
+    {
+        begin_ = nullptr;
+        end_ = nullptr;
+        end_cap_ = nullptr;
+        return *this;
+    }
+    begin_ = new T[other.size()];
+    end_ = begin_;
+    end_cap_ = begin_ + other.size();
+    T* temp = other.begin_;
+    while(temp != other.end_)
+    {
+        *end_ = *temp;
+        end_++;
+        temp++;
+    }
+    return *this;
 }
 
 // Destructor. 
@@ -368,18 +403,35 @@ void Vector<T>::resize(std::size_t n) {
 // Like push_back, value may refer to an element of this vector.
 template <typename T>
 void Vector<T>::insert(std::size_t index, const T& value) {
-    // TODO
-    throw std::logic_error("insert() not implemented");
+    if(index == size())
+    {
+        push_back(value);
+        return;
+    }
+    if(index > size())
+        throw std::out_of_range("index not in vector");
+    T val = value;
+    if (size() == capacity()) {
+        std::size_t new_cap = std::max(capacity() + 1, (size_t)(capacity() * growth_factor));
+        reallocate(new_cap);
+    }
+    for (std::size_t i = size(); i > index; --i) 
+        begin_[i] = begin_[i - 1];
+    begin_[index] = val;
+    end_++;
 }
-
 // Removes the element at index, shifting the elements after it one position
 // left. Capacity is unchanged.
 // Throws std::out_of_range if index >= size() (and changes nothing).
 template <typename T>
 void Vector<T>::erase(std::size_t index) {
-    // TODO
-    throw std::logic_error("erase() not implemented");
+    if (index >= size())
+        throw std::out_of_range("index out of range");
+    for (std::size_t i = index; i < size() - 1; i++)
+        begin_[i] = begin_[i + 1];
+    end_--;
 }
+
 
 // ---- Non-member operators ----
 
@@ -387,15 +439,20 @@ void Vector<T>::erase(std::size_t index) {
 // compares equal with ==. Capacity does not matter.
 template <typename T>
 bool operator==(const Vector<T>& a, const Vector<T>& b) {
-    // TODO
-    throw std::logic_error("operator== not implemented");
+    if (a.size() != b.size())
+        return false;
+    for (std::size_t i = 0; i < a.size(); i++) {
+        if (a[i] != b[i])
+            return false;
+    }
+
+    return true;
 }
 
 // Returns true if a and b are not equal (hint: use operator==).
 template <typename T>
 bool operator!=(const Vector<T>& a, const Vector<T>& b) {
-    // TODO
-    throw std::logic_error("operator!= not implemented");
+    return !(a == b);
 }
 
 #endif
