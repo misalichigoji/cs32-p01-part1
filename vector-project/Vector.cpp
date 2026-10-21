@@ -193,7 +193,7 @@ template <typename T>
 T& Vector<T>::back() {
     if(begin_ == nullptr)
         throw std::out_of_range("vector is empty");
-    return *(end_--);
+    return *(end_ - 1);
 }
 
 // Returns a pointer to the first element of the buffer, or nullptr if there
@@ -218,7 +218,7 @@ T* Vector<T>::begin() {
 // range-for loop run over a const Vector&.
 template <typename T>
 const T* Vector<T>::begin() const {
-    return begin;
+    return begin_;
 }
 
 // Returns a pointer one past the last element (not past the end of the
@@ -253,9 +253,7 @@ std::size_t Vector<T>::capacity() const {
 // Returns true if the vector has no elements (size() == 0).
 template <typename T>
 bool Vector<T>::empty() const {
-    if(begin_ == nullptr)
-        return true;
-    return false;
+    return size() == 0;
 }
 
 // Makes room for n elements up front, so that the vector can later grow to
@@ -269,20 +267,18 @@ void Vector<T>::reserve(std::size_t n) {
     T* temp = new T[n];
     T* newb = temp;
     T* oldb = begin_;
-    begin_ = temp;
-    while(begin_ != end_)
+    T* curr = begin_;
+    std::size_t s = size();
+    while(curr != end_)
     {
-        *temp = *begin_;
+        *temp = *curr;
         temp++;
-        begin_++;
+        curr++;
     }
     delete[] oldb;
     begin_ = newb;
-    end_ = begin_ + n;
+    end_ = begin_ + s;
     end_cap_ = end_;
-    temp = nullptr;
-    newb = nullptr;
-    oldb = nullptr;
 }
 
 // Shrinks the buffer so capacity() == size(), keeping the elements.
@@ -300,23 +296,21 @@ void Vector<T>::shrink_to_fit() {
         end_ = nullptr;
         return;
     }
-    T* temp = new T[size()];
+    T* temp = new T[n];
     T* newb = temp;
     T* oldb = begin_;
-    begin_ = temp;
-    while(begin_ != end_)
+    T* curr = begin_;
+    while(curr != end_)
     {
-        *temp = *begin_;
+        *temp = *curr;
         temp++;
-        begin_++;
+        curr++;
     }
     delete[] oldb;
     begin_ = newb;
     end_cap_ = begin_ + size();
-    temp = nullptr;
-    newb = nullptr;
-    oldb = nullptr;
 }
+
 
 // ---- Modifiers ----
 
