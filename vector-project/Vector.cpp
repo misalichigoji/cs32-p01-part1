@@ -148,8 +148,30 @@ Vector<T>::~Vector() {
 // buffer at all.
 template <typename T>
 void Vector<T>::reallocate(std::size_t new_cap) {
-    // TODO
-    throw std::logic_error("reallocate() not implemented");
+    if(new_cap == 0)
+    {
+        begin_ = nullptr;
+        end_ = nullptr;
+        end_cap_ = nullptr;
+        return;
+    }
+    if(new_cap == capacity())
+        return;
+    std::size_t s = size();
+    T* temp = new T[new_cap];
+    T* newb = temp;
+    T* oldb = begin_;
+    T* curr = begin_;
+    while(curr != end_)
+    {
+        *temp = *curr;
+        temp++;
+        curr++;
+    }
+    delete[] oldb;
+    begin_ = newb;
+    end = newb + s;
+    end_cap_ = begin_ + new_cap;
 }
 
 // ---- Element access ----
@@ -296,7 +318,7 @@ void Vector<T>::shrink_to_fit() {
         end_ = nullptr;
         return;
     }
-    T* temp = new T[n];
+    T* temp = new T[size()];
     T* newb = temp;
     T* oldb = begin_;
     T* curr = begin_;
@@ -309,6 +331,7 @@ void Vector<T>::shrink_to_fit() {
     delete[] oldb;
     begin_ = newb;
     end_cap_ = begin_ + size();
+    end_ = end_cap_;
 }
 
 
@@ -321,24 +344,31 @@ void Vector<T>::shrink_to_fit() {
 // which lives in the old buffer you are about to free.
 template <typename T>
 void Vector<T>::push_back(const T& value) {
-    // TODO
-    throw std::logic_error("push_back() not implemented");
+    if(size() >= capacity())
+    {
+        T val = value;
+        reserve(std::max(capacity() + 1, (size_t)(capacity() * growth_factor)));
+        *end_ = val;
+    }
+    else
+        *end_ = value;
+    end_++;
 }
 
 // Removes the last element. Capacity is unchanged and nothing is freed.
 // Throws std::out_of_range if the vector is empty.
 template <typename T>
 void Vector<T>::pop_back() {
-    // TODO
-    throw std::logic_error("pop_back() not implemented");
+    if(empty())
+        throw std::out_of_range("vector is empty");
+    end_--;
 }
 
 // Removes all elements: size becomes 0. Capacity is unchanged and nothing is
 // freed.
 template <typename T>
 void Vector<T>::clear() {
-    // TODO
-    throw std::logic_error("clear() not implemented");
+    end_ = begin_;
 }
 
 // Changes the size to n.
@@ -348,8 +378,20 @@ void Vector<T>::clear() {
 //     overwritten with T(), not left holding old values.
 template <typename T>
 void Vector<T>::resize(std::size_t n) {
-    // TODO
-    throw std::logic_error("resize() not implemented");
+    if(size() == n)
+        return;
+    if(size() > n)
+    {
+        std::size_t count = size() - n;
+        for(int i = 0; i < count; i++)
+            pop_back();
+        return;
+    }
+    if(capacity() < n)
+        reserve(n);
+    std::size_t count = n - size();
+    for(int i = 0; i < count; i++)
+        push_back(T());
 }
 
 // Inserts a copy of value at position index, so that afterwards v[index] is
