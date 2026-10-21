@@ -42,13 +42,13 @@ Vector<T>::Vector(std::size_t n) {
     {
         begin_ = nullptr;
         end_ = nullptr;
-        end_cap = nullptr;
+        end_cap_ = nullptr;
     }
     else
     {
         begin_ = new T[n]();
-        end_ = begin + n;
-        end_cap_ = end;
+        end_ = begin_ + n;
+        end_cap_ = end_;
     }
 }//?
 
@@ -66,7 +66,7 @@ Vector<T>::Vector(std::size_t n, const T& value) {
     {
         begin_ = new T[n];
         end_ = begin_ + n;
-        end_cap_ = end;
+        end_cap_ = end_;
         T* temp = begin_;
         while(temp != end_)
         {
@@ -99,7 +99,7 @@ Vector<T>::Vector(std::initializer_list<T> il) {
     {
         begin_ = new T[il.size()];
         T* tempr = begin_;
-        T* tempil = il.begin();
+        const T* tempil = il.begin();
         while(tempil != il.end())
         {
             *tempr = *tempil;
@@ -159,14 +159,14 @@ void Vector<T>::reallocate(std::size_t new_cap) {
 // (just like std::vector). at() is the version that checks.
 template <typename T>
 T& Vector<T>::operator[](std::size_t i) {
-    return begin_ + i;
+    return *(begin_ + i);
 }//?
 
 // Same as above, for const vectors. operator== needs this: its parameters are
 // const Vector&, so it can only read elements through a const member function.
 template <typename T>
 const T& Vector<T>::operator[](std::size_t i) const {
-    return const (begin_ + i)
+    return *(begin_ + i);
 }//?
 
 // Returns a reference to element i.
@@ -175,7 +175,7 @@ template <typename T>
 T& Vector<T>::at(std::size_t i) {
     if(i >= size())
         throw std::out_of_range("index " + std::to_string(i) + " is out of range");
-    return begin_ + i;
+    return *(begin_ + i);
 }
 
 // Returns a reference to the first element.
@@ -184,7 +184,7 @@ template <typename T>
 T& Vector<T>::front() {
     if(begin_ == nullptr)
         throw std::out_of_range("vector is empty");
-    return begin_;
+    return *begin_;
 }
 
 // Returns a reference to the last element.
@@ -193,7 +193,7 @@ template <typename T>
 T& Vector<T>::back() {
     if(begin_ == nullptr)
         throw std::out_of_range("vector is empty");
-    return end_--;
+    return *(end_--);
 }
 
 // Returns a pointer to the first element of the buffer, or nullptr if there
@@ -202,7 +202,7 @@ template <typename T>
 T* Vector<T>::data() {
     if(begin_ == nullptr)
         return nullptr;
-    return &begin_;
+    return begin_;
 }
 
 // ---- Iterators ----
@@ -211,27 +211,27 @@ T* Vector<T>::data() {
 // range-for loops and std::sort work on your Vector.
 template <typename T>
 T* Vector<T>::begin() {
-    return &begin_;
+    return begin_;
 }
 
 // Same as above, for const vectors. Together with end() const, this lets a
 // range-for loop run over a const Vector&.
 template <typename T>
 const T* Vector<T>::begin() const {
-    return const(&begin);
+    return begin;
 }
 
 // Returns a pointer one past the last element (not past the end of the
 // buffer). For an empty vector, end() == begin().
 template <typename T>
 T* Vector<T>::end() {
-    return &end_;
+    return end_;
 }
 
 // Same as above, for const vectors.
 template <typename T>
 const T* Vector<T>::end() const {
-    return const(&end_);
+    return end_;
 }
 
 // ---- Capacity ----
@@ -246,7 +246,7 @@ std::size_t Vector<T>::size() const {
 template <typename T>
 std::size_t Vector<T>::capacity() const {
     if(begin_ == nullptr)
-        return 0
+        return 0;
     return end_cap_ - begin_;
 }
 
@@ -279,7 +279,7 @@ void Vector<T>::reserve(std::size_t n) {
     delete[] oldb;
     begin_ = newb;
     end_ = begin_ + n;
-    capacity_ = end_;
+    end_cap_ = end_;
     temp = nullptr;
     newb = nullptr;
     oldb = nullptr;
@@ -298,11 +298,24 @@ void Vector<T>::shrink_to_fit() {
         begin_ = nullptr;
         end_cap_ = nullptr;
         end_ = nullptr;
-        return
+        return;
     }
-    
-    //TODO
-    throw std::logic_error("shrink_to_fit() not implemented");
+    T* temp = new T[size()];
+    T* newb = temp;
+    T* oldb = begin_;
+    begin_ = temp;
+    while(begin_ != end_)
+    {
+        *temp = *begin_;
+        temp++;
+        begin_++;
+    }
+    delete[] oldb;
+    begin_ = newb;
+    end_cap_ = begin_ + size();
+    temp = nullptr;
+    newb = nullptr;
+    oldb = nullptr;
 }
 
 // ---- Modifiers ----
